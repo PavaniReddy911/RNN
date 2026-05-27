@@ -1,13 +1,13 @@
 import streamlit as st
-import tensorflow as tf
 import pickle
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 import re
 import string
+import joblib
 
-from tensorflow.keras.preprocessing.sequence import pad_sequences
+from keras.preprocessing.sequence import pad_sequences
 
 # -----------------------------------------
 # PAGE CONFIG
@@ -22,9 +22,7 @@ st.set_page_config(
 # LOAD MODEL & FILES
 # -----------------------------------------
 
-model = tf.keras.models.load_model(
-    "mental_health_rnn_model.h5"
-)
+model = joblib.load("mental_health_rnn_model.pkl")
 
 with open("tokenizer.pkl", "rb") as file:
     tokenizer = pickle.load(file)
@@ -61,22 +59,22 @@ def clean_text(text):
 guidance = {
 
     "sadness":
-    "Take a short break, listen to calming music, and talk with someone you trust.",
+    "Take a short break and talk with someone you trust.",
 
     "anger":
-    "Try deep breathing exercises and give yourself a little time to relax.",
+    "Try deep breathing exercises and relax for a while.",
 
     "fear":
-    "Focus on the present moment and avoid overthinking future situations.",
+    "Stay calm and focus on positive thoughts.",
 
     "joy":
-    "Keep doing activities that make you feel positive and energetic.",
+    "Keep enjoying activities that make you happy.",
 
     "love":
-    "Stay connected with people who support and value you.",
+    "Spend time with supportive people around you.",
 
     "surprise":
-    "Take things calmly and give yourself time to process emotions."
+    "Take things slowly and process your emotions calmly."
 }
 
 # -----------------------------------------
@@ -96,17 +94,11 @@ st.subheader(
 st.markdown("## 📌 About the Project")
 
 st.write("""
-This project uses Artificial Intelligence and Natural Language Processing (NLP)
+This application uses Artificial Intelligence and Natural Language Processing (NLP)
 to analyze emotional sentiment from user text messages.
 
-The system uses a Simple Recurrent Neural Network (RNN) to understand
-sequence patterns in text and identify emotional states.
-
-Emotional AI can help in:
-- early emotional trend detection
-- mental wellness monitoring
-- counselor assistance systems
-- real-time sentiment analysis
+The system uses a Simple Recurrent Neural Network (RNN)
+to identify emotional patterns in text sequences.
 """)
 
 # -----------------------------------------
@@ -116,7 +108,7 @@ Emotional AI can help in:
 st.markdown("## ✍ User Text Input")
 
 st.write("### Sample Sentences")
-st.write("- I feel lonely and exhausted")
+st.write("- I feel lonely and stressed")
 st.write("- I am excited about my future")
 st.write("- Nobody understands me anymore")
 
@@ -136,7 +128,7 @@ if st.button("🔍 Analyze Emotion"):
 
     else:
 
-        # Preprocess Text
+        # Clean Text
         cleaned_text = clean_text(user_input)
 
         # Convert to Sequence
@@ -217,5 +209,5 @@ if st.button("🔍 Analyze Emotion"):
 
         else:
             st.write(
-                "Take care of yourself and maintain a healthy daily routine."
+                "Maintain a healthy routine and take care of yourself."
             )
