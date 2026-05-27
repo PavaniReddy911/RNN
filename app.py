@@ -1,28 +1,28 @@
 import streamlit as st
+import tensorflow as tf
 import pickle
 import numpy as np
-import pandas as pd
 import matplotlib.pyplot as plt
 import re
 import string
-import joblib
 
-from keras.preprocessing.sequence import pad_sequences
+from tensorflow.keras.preprocessing.sequence import pad_sequences
+from tensorflow.keras.models import load_model
 
-# -----------------------------------------
+# -----------------------------------
 # PAGE CONFIG
-# -----------------------------------------
+# -----------------------------------
 
 st.set_page_config(
     page_title="Mental Health Sentiment Monitoring",
     layout="wide"
 )
 
-# -----------------------------------------
+# -----------------------------------
 # LOAD MODEL & FILES
-# -----------------------------------------
+# -----------------------------------
 
-model = joblib.load("mental_health_rnn_model.pkl")
+model = load_model("mental_health_rnn_model.h5")
 
 with open("tokenizer.pkl", "rb") as file:
     tokenizer = pickle.load(file)
@@ -30,15 +30,15 @@ with open("tokenizer.pkl", "rb") as file:
 with open("label_encoder.pkl", "rb") as file:
     label_encoder = pickle.load(file)
 
-# -----------------------------------------
+# -----------------------------------
 # PARAMETERS
-# -----------------------------------------
+# -----------------------------------
 
 max_length = 50
 
-# -----------------------------------------
+# -----------------------------------
 # TEXT PREPROCESSING
-# -----------------------------------------
+# -----------------------------------
 
 def clean_text(text):
 
@@ -52,9 +52,9 @@ def clean_text(text):
 
     return text
 
-# -----------------------------------------
-# EMOTIONAL GUIDANCE
-# -----------------------------------------
+# -----------------------------------
+# WELLNESS TIPS
+# -----------------------------------
 
 guidance = {
 
@@ -68,7 +68,7 @@ guidance = {
     "Stay calm and focus on positive thoughts.",
 
     "joy":
-    "Keep enjoying activities that make you happy.",
+    "Keep doing activities that make you feel happy.",
 
     "love":
     "Spend time with supportive people around you.",
@@ -77,9 +77,9 @@ guidance = {
     "Take things slowly and process your emotions calmly."
 }
 
-# -----------------------------------------
-# HEADER SECTION
-# -----------------------------------------
+# -----------------------------------
+# HEADER
+# -----------------------------------
 
 st.title("🧠 AI-Based Mental Health Sentiment Monitoring System")
 
@@ -87,28 +87,35 @@ st.subheader(
     "Emotion Detection using Simple Recurrent Neural Networks"
 )
 
-# -----------------------------------------
-# ABOUT PROJECT
-# -----------------------------------------
+# -----------------------------------
+# ABOUT SECTION
+# -----------------------------------
 
 st.markdown("## 📌 About the Project")
 
 st.write("""
-This application uses Artificial Intelligence and Natural Language Processing (NLP)
-to analyze emotional sentiment from user text messages.
+This project uses Artificial Intelligence and Natural Language Processing (NLP)
+to analyze emotional sentiment from text messages.
 
 The system uses a Simple Recurrent Neural Network (RNN)
-to identify emotional patterns in text sequences.
+to understand sequence patterns and detect emotional states.
+
+Applications include:
+- emotional wellness monitoring
+- NLP-based sentiment analysis
+- counselor assistance systems
+- early emotional trend detection
 """)
 
-# -----------------------------------------
-# USER INPUT AREA
-# -----------------------------------------
+# -----------------------------------
+# USER INPUT
+# -----------------------------------
 
 st.markdown("## ✍ User Text Input")
 
 st.write("### Sample Sentences")
-st.write("- I feel lonely and stressed")
+
+st.write("- I feel lonely and exhausted")
 st.write("- I am excited about my future")
 st.write("- Nobody understands me anymore")
 
@@ -117,9 +124,9 @@ user_input = st.text_area(
     height=150
 )
 
-# -----------------------------------------
+# -----------------------------------
 # PREDICTION BUTTON
-# -----------------------------------------
+# -----------------------------------
 
 if st.button("🔍 Analyze Emotion"):
 
@@ -128,10 +135,10 @@ if st.button("🔍 Analyze Emotion"):
 
     else:
 
-        # Clean Text
+        # Clean text
         cleaned_text = clean_text(user_input)
 
-        # Convert to Sequence
+        # Convert text to sequence
         sequence = tokenizer.texts_to_sequences(
             [cleaned_text]
         )
@@ -154,9 +161,9 @@ if st.button("🔍 Analyze Emotion"):
             [predicted_index]
         )[0]
 
-        # -----------------------------------------
+        # -----------------------------------
         # OUTPUT SECTION
-        # -----------------------------------------
+        # -----------------------------------
 
         st.markdown("## 📊 Prediction Output")
 
@@ -168,15 +175,19 @@ if st.button("🔍 Analyze Emotion"):
             f"Confidence Score: {confidence*100:.2f}%"
         )
 
-        # Emotional Status
+        # Emotional status
         if confidence > 0.80:
-            st.write("Emotional Status: Strong Emotional Pattern Detected")
+            st.write(
+                "Emotional Status: Strong Emotional Pattern Detected"
+            )
         else:
-            st.write("Emotional Status: Moderate Emotional Pattern Detected")
+            st.write(
+                "Emotional Status: Moderate Emotional Pattern Detected"
+            )
 
-        # -----------------------------------------
+        # -----------------------------------
         # VISUALIZATION
-        # -----------------------------------------
+        # -----------------------------------
 
         st.markdown("## 📈 Sentiment Confidence Graph")
 
@@ -198,16 +209,18 @@ if st.button("🔍 Analyze Emotion"):
 
         st.pyplot(fig)
 
-        # -----------------------------------------
-        # GUIDANCE SECTION
-        # -----------------------------------------
+        # -----------------------------------
+        # WELLNESS TIPS
+        # -----------------------------------
 
         st.markdown("## 💙 Emotional Wellness Tips")
 
         if predicted_emotion in guidance:
+
             st.write(guidance[predicted_emotion])
 
         else:
+
             st.write(
-                "Maintain a healthy routine and take care of yourself."
+                "Take care of yourself and maintain a healthy routine."
             )
