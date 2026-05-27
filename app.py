@@ -2,7 +2,6 @@ import streamlit as st
 import numpy as np
 import matplotlib.pyplot as plt
 import pandas as pd
-import random
 
 # ======================================================
 # PAGE CONFIG
@@ -21,8 +20,6 @@ st.set_page_config(
 st.markdown("""
 <style>
 
-/* MAIN BACKGROUND */
-
 .stApp {
     background: linear-gradient(
         135deg,
@@ -34,13 +31,9 @@ st.markdown("""
     color: white;
 }
 
-/* REMOVE DEFAULT PADDING */
-
 .block-container {
     padding-top: 2rem;
 }
-
-/* TITLES */
 
 h1 {
     font-size: 3rem !important;
@@ -54,8 +47,6 @@ h2, h3 {
     color: #f8fafc !important;
 }
 
-/* GLASS EFFECT */
-
 .glass-card {
     background: rgba(255,255,255,0.08);
     backdrop-filter: blur(14px);
@@ -65,8 +56,6 @@ h2, h3 {
     box-shadow: 0px 0px 20px rgba(56,189,248,0.2);
     margin-bottom: 20px;
 }
-
-/* PREDICTION BOX */
 
 .prediction-box {
     background: linear-gradient(
@@ -79,8 +68,6 @@ h2, h3 {
     text-align: center;
     box-shadow: 0px 0px 25px rgba(37,99,235,0.5);
 }
-
-/* BUTTON */
 
 .stButton>button {
     width: 100%;
@@ -103,14 +90,10 @@ h2, h3 {
     box-shadow: 0px 0px 25px #38bdf8;
 }
 
-/* TEXT AREA */
-
 textarea {
     background-color: rgba(255,255,255,0.05) !important;
     color: white !important;
 }
-
-/* METRICS */
 
 [data-testid="metric-container"] {
     background: rgba(255,255,255,0.08);
@@ -118,14 +101,6 @@ textarea {
     padding: 15px;
     border: 1px solid rgba(255,255,255,0.1);
 }
-
-/* SIDEBAR */
-
-section[data-testid="stSidebar"] {
-    background: #020617;
-}
-
-/* PROGRESS BAR */
 
 .stProgress > div > div > div > div {
     background: linear-gradient(
@@ -161,14 +136,14 @@ st.markdown("""
 
 <p style="text-align:center; font-size:18px;">
 Advanced NLP-powered emotional sentiment analysis
-for mental wellness monitoring and emotional AI systems.
+for emotional wellness and intelligent healthcare systems.
 </p>
 
 </div>
 """, unsafe_allow_html=True)
 
 # ======================================================
-# ABOUT PROJECT
+# ABOUT SECTION
 # ======================================================
 
 st.header("📘 About the Project")
@@ -180,10 +155,10 @@ with col1:
     <div class="glass-card">
     <h3>Importance of Emotional AI</h3>
 
-    ✅ Early emotional detection<br>
     ✅ Mental wellness monitoring<br>
-    ✅ Counselor assistance<br>
-    ✅ AI healthcare support
+    ✅ Early emotional detection<br>
+    ✅ AI healthcare systems<br>
+    ✅ Emotional support analysis
 
     </div>
     """, unsafe_allow_html=True)
@@ -195,8 +170,8 @@ with col2:
 
     ✅ Sentiment analysis<br>
     ✅ Chatbots<br>
-    ✅ Emotion detection<br>
-    ✅ Language understanding
+    ✅ Language understanding<br>
+    ✅ Emotional intelligence
 
     </div>
     """, unsafe_allow_html=True)
@@ -207,23 +182,23 @@ with col3:
     <h3>Role of RNN</h3>
 
     ✅ Sequence learning<br>
+    ✅ Word memory<br>
     ✅ Context understanding<br>
-    ✅ Previous word memory<br>
-    ✅ Text pattern learning
+    ✅ Pattern recognition
 
     </div>
     """, unsafe_allow_html=True)
 
 # ======================================================
-# INPUT SECTION
+# USER INPUT
 # ======================================================
 
-st.header("✍ Enter Your Thoughts")
+st.header("✍ User Text Input")
 
 st.write("### Sample Sentences")
 
 st.write("- I feel lonely and stressed")
-st.write("- I am very excited about my future")
+st.write("- I am very happy today")
 st.write("- Nobody understands me anymore")
 
 user_input = st.text_area(
@@ -232,7 +207,7 @@ user_input = st.text_area(
 )
 
 # ======================================================
-# EMOTION CLASSES
+# CLASSES
 # ======================================================
 
 classes = [
@@ -244,40 +219,132 @@ classes = [
     "Surprise"
 ]
 
+# ======================================================
+# GUIDANCE
+# ======================================================
+
 guidance = {
-    "Joy": "Keep doing things that make you happy and motivated.",
-    "Sadness": "Take some rest and talk with trusted people.",
-    "Anger": "Try deep breathing exercises and stay calm.",
-    "Fear": "Focus on positive thoughts and avoid overthinking.",
-    "Love": "Stay connected with supportive people around you.",
-    "Surprise": "Take things slowly and process emotions calmly."
+
+    "Joy":
+    "Keep doing activities that make you feel positive and motivated.",
+
+    "Sadness":
+    "Take some rest and talk with trusted people around you.",
+
+    "Anger":
+    "Try deep breathing and relaxation techniques.",
+
+    "Fear":
+    "Focus on positive thoughts and avoid overthinking.",
+
+    "Love":
+    "Stay connected with supportive and caring people.",
+
+    "Surprise":
+    "Take things calmly and process your emotions slowly."
 }
+
+# ======================================================
+# STATUS MAP
+# ======================================================
 
 status_map = {
-    "Joy": "Positive Emotional State",
-    "Sadness": "Needs Emotional Support",
-    "Anger": "Stress Detected",
-    "Fear": "Anxiety Pattern Detected",
-    "Love": "Emotionally Connected",
-    "Surprise": "Unexpected Emotional Response"
+
+    "Joy":
+    "Positive Emotional State",
+
+    "Sadness":
+    "Needs Emotional Support",
+
+    "Anger":
+    "Stress Detected",
+
+    "Fear":
+    "Anxiety Pattern Detected",
+
+    "Love":
+    "Emotionally Connected",
+
+    "Surprise":
+    "Unexpected Emotional Response"
 }
 
 # ======================================================
-# PREDICTION FUNCTION
+# KEYWORD-BASED PREDICTION
 # ======================================================
 
-def predict_emotion():
+def predict_emotion(text):
 
-    probabilities = np.random.dirichlet(
-        np.ones(len(classes)),
-        size=1
-    )[0]
+    text = text.lower()
 
-    predicted_index = np.argmax(probabilities)
+    emotion_keywords = {
 
-    prediction = classes[predicted_index]
+        "Joy": [
+            "happy", "excited", "great",
+            "awesome", "good", "amazing",
+            "wonderful", "fantastic"
+        ],
 
-    confidence = probabilities[predicted_index] * 100
+        "Sadness": [
+            "sad", "depressed", "cry",
+            "hopeless", "lonely", "tired"
+        ],
+
+        "Anger": [
+            "angry", "hate", "mad",
+            "annoyed", "frustrated"
+        ],
+
+        "Fear": [
+            "fear", "afraid", "anxious",
+            "worried", "stress", "scared"
+        ],
+
+        "Love": [
+            "love", "care", "affection",
+            "relationship"
+        ],
+
+        "Surprise": [
+            "surprised", "shocked",
+            "unexpected"
+        ]
+    }
+
+    scores = []
+
+    for emotion in classes:
+
+        score = 0
+
+        for word in emotion_keywords[emotion]:
+
+            if word in text:
+
+                score += 1
+
+        scores.append(score)
+
+    if max(scores) == 0:
+
+        probabilities = np.ones(len(classes)) / len(classes)
+
+        prediction = "Joy"
+
+        confidence = 50
+
+    else:
+
+        predicted_index = np.argmax(scores)
+
+        prediction = classes[predicted_index]
+
+        confidence = (
+            scores[predicted_index]
+            / sum(scores)
+        ) * 100
+
+        probabilities = np.array(scores) / sum(scores)
 
     return prediction, confidence, probabilities
 
@@ -293,7 +360,7 @@ if st.button("🧠 Analyze Emotion"):
 
     else:
 
-        prediction, confidence, probabilities = predict_emotion()
+        prediction, confidence, probabilities = predict_emotion(user_input)
 
         emotional_status = status_map[prediction]
 
@@ -347,8 +414,6 @@ if st.button("🧠 Analyze Emotion"):
             "Confidence": probabilities * 100
         })
 
-        # BAR CHART
-
         st.subheader("📈 Sentiment Confidence Graph")
 
         fig, ax = plt.subplots(figsize=(8,5))
@@ -366,7 +431,9 @@ if st.button("🧠 Analyze Emotion"):
 
         st.pyplot(fig)
 
+        # ======================================================
         # PIE CHART
+        # ======================================================
 
         st.subheader("🥧 Probability Distribution")
 
@@ -411,7 +478,7 @@ if st.button("🧠 Analyze Emotion"):
         elif prediction == "Anger":
 
             st.error(
-                "⚠️ High stress/emotional intensity detected."
+                "⚠️ High emotional stress detected."
             )
 
         else:
@@ -441,9 +508,9 @@ st.markdown("""
 </h2>
 
 <p style="text-align:center; font-size:18px;">
-AI-powered mental health monitoring systems can help
-improve emotional wellness, provide early intervention,
-and support future intelligent healthcare systems.
+AI-powered emotional monitoring systems can support
+mental wellness, provide early intervention,
+and improve intelligent healthcare technologies.
 </p>
 
 </div>
